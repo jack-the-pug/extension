@@ -84,6 +84,9 @@ function WalletTypeHeader({
                       history.push("/keyring/unlock")
                     }
                     break
+                  case "ledger":
+                    onClickAddAddress()
+                    break
                   default:
                     break
                 }
@@ -227,6 +230,11 @@ export default function AccountsNotificationPanelAccounts({
                           deriveAddress(accountTotalsByKeyringId[0].keyringId)
                         )
                       }
+                    }
+                  case "ledger":
+                    return () => {
+                      window.open("/tab.html#/ledger", "_blank")?.focus()
+                      window.close()
                     }
                   default:
                     return undefined
