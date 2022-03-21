@@ -75,10 +75,17 @@ function WalletTypeHeader({
               icon="plus"
               iconSize="medium"
               onClick={() => {
-                if (areKeyringsUnlocked) {
-                  onClickAddAddress()
-                } else {
-                  history.push("/keyring/unlock")
+                switch (accountType) {
+                  case "imported":
+                  case "internal":
+                    if (areKeyringsUnlocked) {
+                      onClickAddAddress()
+                    } else {
+                      history.push("/keyring/unlock")
+                    }
+                    break
+                  default:
+                    break
                 }
               }}
             >
@@ -210,24 +217,27 @@ export default function AccountsNotificationPanelAccounts({
 
           return Object.values(accountTotalsByType).map(
             (accountTotalsByKeyringId, idx) => {
+              const onClickAddress = () => {
+                switch (accountType) {
+                  case "imported":
+                  case "internal":
+                    return () => {
+                      if (accountTotalsByKeyringId[0].keyringId) {
+                        dispatch(
+                          deriveAddress(accountTotalsByKeyringId[0].keyringId)
+                        )
+                      }
+                    }
+                  default:
+                    return undefined
+                }
+              }
               return (
                 <section key={accountType}>
                   <WalletTypeHeader
                     accountType={accountType}
                     walletNumber={idx + 1}
-                    onClickAddAddress={
-                      accountType === "imported" || accountType === "internal"
-                        ? () => {
-                            if (accountTotalsByKeyringId[0].keyringId) {
-                              dispatch(
-                                deriveAddress(
-                                  accountTotalsByKeyringId[0].keyringId
-                                )
-                              )
-                            }
-                          }
-                        : undefined
-                    }
+                    onClickAddAddress={onClickAddress()}
                   />
                   <ul>
                     {accountTotalsByKeyringId.map((accountTotal) => {
